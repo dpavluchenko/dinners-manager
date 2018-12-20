@@ -1,19 +1,21 @@
 package security;
 
-import config.ApplicationProperties;
 import domain.UserRole;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 public class SecurityConfig {
 
-    private List<RouteMatch> permittedRoutes;
-    private List<RouteMatch> authenticatedRoutes;
-    private Map<UserRole, List<RouteMatch>> routesByRole;
+    private final List<RouteMatch> permittedRoutes;
+    private final List<RouteMatch> authenticatedRoutes;
+    private final Map<UserRole, List<RouteMatch>> routesByRole;
 
-    private final String userAttrName = ApplicationProperties.getInstance().getProperty("session.user.attr");
+    private final String userAttrName = "userDetails";
 
     private SecurityConfig(Builder builder) {
         this.permittedRoutes = builder.permittedRoutes;
@@ -31,11 +33,13 @@ public class SecurityConfig {
         if (matchesPattern(authenticatedRoutes, route)){
            if (session == null) return PermissionStatus.UNAUTHORIZED;
            else {
-               UserDetails userDetails = (UserDetails) session.getAttribute(userAttrName);
-               if (userDetails.getRoles().stream().anyMatch(role ->
-                       matchesPattern(routesByRole.get(role), route))) {
+               UserRole userRole = matchesRoleByPattern(routesByRole, route);
+               if (userRole == null){
                    return PermissionStatus.OK;
-               } else return PermissionStatus.FORBIDDEN;
+               } else {
+                   UserDetails userDetails = (UserDetails) session.getAttribute(userAttrName);
+                   return userDetails.getRole().equals(userRole) ? PermissionStatus.OK : PermissionStatus.FORBIDDEN;
+               }
            }
         }
 
@@ -44,6 +48,17 @@ public class SecurityConfig {
 
     private boolean matchesPattern(List<RouteMatch> routeMatches,String pattern){
         return routeMatches.stream().anyMatch(route -> route.matches(pattern));
+    }
+
+    private UserRole matchesRoleByPattern(Map<UserRole, List<RouteMatch>> routeMatches, String pattern){
+        UserRole userRole = null;
+        for (Map.Entry<UserRole, List<RouteMatch>> entry : routeMatches.entrySet()) {
+            if (matchesPattern(entry.getValue(), pattern)) {
+                userRole = entry.getKey();
+                break;
+            }
+        }
+        return userRole;
     }
 
     public static Builder create() {

@@ -19,7 +19,6 @@ public class SecurityFilter implements Filter {
                 .create()
                 .permitAll("/api/login", "/api/logout", "/api/user/register")
                 .authenticated("/api", "/api/manage/*")
-                .hasRole(UserRole.USER, "/api")
                 .hasRole(UserRole.MANAGER, "/api/manage/*")
                 .build();
     }

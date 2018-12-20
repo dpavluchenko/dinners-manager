@@ -1,18 +1,19 @@
 package security;
 
+import domain.User;
 import domain.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-@Getter
-@Setter
+@Getter @Setter
 public class UserDetails {
-    private String username;
-    private List<UserRole> roles;
+    private Long userId;
+    private String fullName;
+    private UserRole role;
 
-    public UserDetails(String username, List<UserRole> roles) {
-        this.username = username;
-        this.roles = roles;
+    public UserDetails(User user) {
+        this.userId = user.getId();
+        this.fullName = user.getFullName();
+        this.role = user.getRole();
     }
 }
