@@ -15,6 +15,11 @@ public abstract class AbstractDataMapper{
     protected final ConnectionSupplier connectionSupplier;
 
     protected AbstractDataMapper() {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
         ApplicationProperties properties = ApplicationProperties.getInstance();
         connectionSupplier = () -> DriverManager.getConnection(properties.getProperty("db.url"),
                 properties.getProperty("db.user"), properties.getProperty("db.password"));

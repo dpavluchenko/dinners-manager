@@ -3,6 +3,7 @@ package security;
 import domain.UserRole;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -23,27 +24,27 @@ public class SecurityConfig {
         this.routesByRole = builder.routesByRole;
     }
 
-    public PermissionStatus checkUserPermission(HttpServletRequest request) {
+    public int checkUserPermission(HttpServletRequest request) {
         String route = request.getServletPath();
 
-        if (matchesPattern(permittedRoutes, route)) return PermissionStatus.OK;
+        if (matchesPattern(permittedRoutes, route)) return HttpServletResponse.SC_OK;
 
         HttpSession session = request.getSession(false);
 
         if (matchesPattern(authenticatedRoutes, route)){
-           if (session == null) return PermissionStatus.UNAUTHORIZED;
+           if (session == null) return HttpServletResponse.SC_UNAUTHORIZED;
            else {
                UserRole userRole = matchesRoleByPattern(routesByRole, route);
                if (userRole == null){
-                   return PermissionStatus.OK;
+                   return HttpServletResponse.SC_OK;
                } else {
                    UserDetails userDetails = (UserDetails) session.getAttribute(userAttrName);
-                   return userDetails.getRole().equals(userRole) ? PermissionStatus.OK : PermissionStatus.FORBIDDEN;
+                   return userDetails.getRole().equals(userRole) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
                }
            }
         }
 
-        return PermissionStatus.NOT_FOUND;
+        return HttpServletResponse.SC_NOT_FOUND;
     }
 
     private boolean matchesPattern(List<RouteMatch> routeMatches,String pattern){

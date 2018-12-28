@@ -13,11 +13,11 @@ public class LoginAction implements SessionAction{
 
     @Override
     public void process(HttpServletRequest request, HttpServletResponse response) {
-        String username = request.getParameter("fullName");
+        String username = request.getParameter("username");
         String password = request.getParameter("password");
-        UserDataMapper userDataMapper = SimpleDataMapperFactory.getDataMapperFor(User.class);
+        UserDataMapper userDataMapper = SimpleDataMapperFactory.getDataMapperFor(UserDataMapper.class);
         User user = userDataMapper.findByUsername(username);
-        if (user.checkPasswordIdentity(password)){
+        if (user.isPresent() && user.checkPasswordIdentity(password)){
             HttpSession session = request.getSession(true);
             session.setAttribute(userAttrName, new UserDetails(user));
             response.setStatus(200);

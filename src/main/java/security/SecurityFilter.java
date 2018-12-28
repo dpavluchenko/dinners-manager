@@ -17,7 +17,7 @@ public class SecurityFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         this.securityConfig = SecurityConfig
                 .create()
-                .permitAll("/api/login", "/api/logout", "/api/user/register")
+                .permitAll("/api/login", "/api/logout", "/api/register")
                 .authenticated("/api", "/api/manage/*")
                 .hasRole(UserRole.MANAGER, "/api/manage/*")
                 .build();
@@ -28,10 +28,10 @@ public class SecurityFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        PermissionStatus status = securityConfig.checkUserPermission(req);
+        int status = securityConfig.checkUserPermission(req);
 
-        if (status.equals(PermissionStatus.OK)) chain.doFilter(req, res);
-        else res.sendError(status.code);
+        if (status == HttpServletResponse.SC_OK) chain.doFilter(req, res);
+        else res.setStatus(status);
     }
 
     @Override

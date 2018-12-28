@@ -1,8 +1,7 @@
 package dao.client;
 
+import dao.impl.MealDataMapperPgImpl;
 import dao.impl.UserDataMapperPgImpl;
-import domain.Entity;
-import domain.User;
 
 import java.util.NoSuchElementException;
 
@@ -10,10 +9,11 @@ public class SimpleDataMapperFactory {
     private SimpleDataMapperFactory() {
     }
 
-    public static <T extends DataMapper> T getDataMapperFor(Class<? extends Entity> entity) {
+    public static <T extends DataMapper> T getDataMapperFor(Class<T> mapper) {
       DataMapper dataMapper;
-      if (entity == User.class) dataMapper = UserDataMapperPgImpl.getInstance();
-      else throw new NoSuchElementException(String.format("Can't find mapper for %s", entity));
+      if (mapper == UserDataMapper.class) dataMapper = UserDataMapperPgImpl.getInstance();
+      else if (mapper == MealDataMapper.class) dataMapper = MealDataMapperPgImpl.getInstance();
+      else throw new NoSuchElementException(String.format("Can't find mapper for %s", mapper));
       return (T) dataMapper;
     }
 
