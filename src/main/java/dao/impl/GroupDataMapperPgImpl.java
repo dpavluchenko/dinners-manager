@@ -9,24 +9,27 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     private static GroupDataMapper dataMapper = new GroupDataMapperPgImpl();
 
-    private GroupDataMapperPgImpl(){}
+    private GroupDataMapperPgImpl() {
+    }
 
     @Override
-    public Long create(Group group) {
+    public Group create(Group group) {
         String sql = "insert into groups (time, name) values (?, ?) returning id";
-        return executeQuery(sql, ps -> {
+        Long id = executeQuery(sql, ps -> {
             ps.setString(1, group.getDinnerTime());
             ps.setString(2, group.getName());
             ResultSet resultSet = ps.executeQuery();
             resultSet.next();
             return resultSet.getLong("id");
         });
+        group.setId(id);
+        return group;
     }
 
     @Override
     public Group findById(Long id) {
         String sql = "select * from groups where id=?";
-        return executeQuery(sql, ps-> {
+        return executeQuery(sql, ps -> {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             Group group = new Group();
@@ -39,7 +42,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
         });
     }
 
-    public static GroupDataMapper getInstance(){
+    public static GroupDataMapper getInstance() {
         return dataMapper;
     }
 }

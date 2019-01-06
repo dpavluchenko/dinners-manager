@@ -1,20 +1,22 @@
 package controller.binder;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 public class HttpDataBinder {
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static <T> T getDataFromRequest(HttpServletRequest request, Class<T> dataClass) {
-        try {
-            return mapper.readValue(request.getReader(), dataClass);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static <T> T getModelFromRequest(HttpServletRequest request, Class<T> dataClass) {
+        return getData(request, mapper.constructType(dataClass));
+    }
+
+    public static <T> List<T> getListOfModelsFromRequest(HttpServletRequest request, Class<T> dataClass) {
+        return getData(request, mapper.getTypeFactory().constructCollectionType(List.class, dataClass));
     }
 
     public static void writeDataToResponse(Object data, HttpServletResponse response) {
@@ -24,6 +26,14 @@ public class HttpDataBinder {
                     .write(
                             mapper
                                     .writeValueAsString(data));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> T getData(HttpServletRequest request, JavaType type) {
+        try {
+            return mapper.readValue(request.getReader(), type);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

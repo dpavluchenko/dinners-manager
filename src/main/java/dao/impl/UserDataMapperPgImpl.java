@@ -10,12 +10,13 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     private static UserDataMapper dataMapper = new UserDataMapperPgImpl();
 
-    private UserDataMapperPgImpl(){}
+    private UserDataMapperPgImpl() {
+    }
 
     @Override
     public User findByUsername(String username) {
         String sql = "select * from users where username=?";
-        return executeQuery(sql, ps-> {
+        return executeQuery(sql, ps -> {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             User user = new User();
@@ -31,9 +32,9 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
     }
 
     @Override
-    public Long create(User user) {
+    public User create(User user) {
         String sql = "insert into users (username, password, full_name, role) values (?, ?, ?, ?) returning id";
-        return executeQuery(sql, ps -> {
+        Long id = executeQuery(sql, ps -> {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getFullName());
@@ -42,6 +43,8 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
             resultSet.next();
             return resultSet.getLong("id");
         });
+        user.setId(id);
+        return user;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
         return null;
     }
 
-    public static UserDataMapper getInstance(){
+    public static UserDataMapper getInstance() {
         return dataMapper;
     }
 }

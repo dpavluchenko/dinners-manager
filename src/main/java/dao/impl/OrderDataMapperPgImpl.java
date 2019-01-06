@@ -1,8 +1,6 @@
 package dao.impl;
 
 import dao.client.OrderDataMapper;
-import domain.Meal;
-import domain.MealType;
 import domain.Order;
 
 import java.sql.Date;
@@ -15,9 +13,9 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
     private OrderDataMapperPgImpl(){}
 
     @Override
-    public Long create(Order order) {
+    public Order create(Order order) {
         String sql = "insert into orders (date, user_id, meal_id) values (?, ?, ?) returning id";
-        return executeQuery(sql, ps -> {
+        Long id = executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(order.getDate()));
             ps.setLong(2, order.getUserId());
             ps.setLong(3, order.getMealId());
@@ -25,6 +23,8 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
             resultSet.next();
             return resultSet.getLong("id");
         });
+        order.setId(id);
+        return order;
     }
 
     @Override

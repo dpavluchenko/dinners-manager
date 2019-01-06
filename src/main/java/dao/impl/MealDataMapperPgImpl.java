@@ -3,12 +3,11 @@ package dao.impl;
 import dao.client.MealDataMapper;
 import domain.Meal;
 import domain.MealType;
-import domain.User;
-import domain.UserRole;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.util.List;
 
 public class MealDataMapperPgImpl extends AbstractDataMapper implements MealDataMapper {
 
@@ -17,9 +16,9 @@ public class MealDataMapperPgImpl extends AbstractDataMapper implements MealData
     private MealDataMapperPgImpl(){}
 
     @Override
-    public Long create(Meal meal) {
+    public Meal create(Meal meal) {
         String sql = "insert into meals (name, date, type) values (?, ?, ?) returning id";
-        return executeQuery(sql, ps -> {
+        Long id = executeQuery(sql, ps -> {
             ps.setString(1, meal.getName());
             ps.setDate(2, Date.valueOf(meal.getDate()));
             ps.setString(3, meal.getType().name());
@@ -27,6 +26,8 @@ public class MealDataMapperPgImpl extends AbstractDataMapper implements MealData
             resultSet.next();
             return resultSet.getLong("id");
         });
+        meal.setId(id);
+        return meal;
     }
 
     @Override
@@ -38,6 +39,11 @@ public class MealDataMapperPgImpl extends AbstractDataMapper implements MealData
             return resultSet.getDate("max").toLocalDate();
             else return null;
         });
+    }
+
+    @Override
+    public List<Meal> create(List<Meal> meals) {
+        return null;
     }
 
     @Override

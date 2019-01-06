@@ -10,7 +10,6 @@ import domain.event.RemoveMealEvent;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Calendar;
 import java.util.Collections;
@@ -24,17 +23,13 @@ public class DinnerCalendar {
 
     private final ScheduledExecutorService scheduledTask;
     private final Map<LocalDate, LocalDate> dateStorage;
-    private final DateTimeFormatter dateTimeFormatter;
-    private final MealDataMapper mealDataMapper;
     private final WeekFields week;
     private LocalDate maxDate;
 
     private DinnerCalendar() {
-        this.mealDataMapper = SimpleDataMapperFactory.getDataMapperFor(MealDataMapper.class);
         this.dateStorage = new ConcurrentHashMap<>();
         this.week = WeekFields.ISO;
         this.scheduledTask = Executors.newSingleThreadScheduledExecutor();
-        this.dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         initDates();
         subscribeToEvents();
         runClearDateStorage();
@@ -45,14 +40,6 @@ public class DinnerCalendar {
             return new Period(LocalDate.now(), maxDate);
         }
         return new Period(findFirstDayOfWeekDate(), maxDate);
-    }
-
-    public String dateToString(LocalDate date) {
-        return date != null ? date.format(dateTimeFormatter) : "";
-    }
-
-    public LocalDate parseLocalDate(String str) {
-        return str != null && !str.isEmpty() ? LocalDate.parse(str, dateTimeFormatter) : null;
     }
 
     private void addMealDate(LocalDate date) {
@@ -66,6 +53,7 @@ public class DinnerCalendar {
     }
 
     private void initDates() {
+        MealDataMapper mealDataMapper = SimpleDataMapperFactory.getDataMapperFor(MealDataMapper.class);
         LocalDate max = mealDataMapper.findMaxMealDate();
         this.maxDate = max != null ? max : LocalDate.now();
         this.dateStorage.put(maxDate, maxDate);
