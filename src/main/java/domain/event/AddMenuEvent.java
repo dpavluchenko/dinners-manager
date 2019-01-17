@@ -6,6 +6,6 @@ import lombok.Getter;
 import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
-public class AddMealEvent extends Event{
+public class AddMenuEvent extends Event{
     private LocalDate date;
 }

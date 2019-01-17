@@ -2,6 +2,8 @@ package controller.binder;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import exception.binder.DataReadException;
+import exception.binder.DataWriteException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +29,7 @@ public class HttpDataBinder {
                             mapper
                                     .writeValueAsString(data));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DataReadException(e);
         }
     }
 
@@ -35,7 +37,7 @@ public class HttpDataBinder {
         try {
             return mapper.readValue(request.getReader(), type);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DataWriteException(e);
         }
     }
 }

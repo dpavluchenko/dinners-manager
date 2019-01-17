@@ -10,10 +10,12 @@ public class UserDetails {
     private Long userId;
     private String fullName;
     private UserRole role;
+    private Long groupId;
 
     public UserDetails(User user) {
         this.userId = user.getId();
         this.fullName = user.getFullName();
         this.role = user.getRole();
+        this.groupId = user.getGroupId();
     }
 }

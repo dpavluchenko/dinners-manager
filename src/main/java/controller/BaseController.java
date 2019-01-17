@@ -1,8 +1,12 @@
 package controller;
 
 import config.ApplicationProperties;
+import controller.handler.ExceptionHandler;
+import controller.handler.RequestProcessor;
 
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public abstract class BaseController extends HttpServlet {
 
@@ -10,5 +14,13 @@ public abstract class BaseController extends HttpServlet {
 
     protected String getUserSessionKey() {
         return properties.getProperty("session.user.key");
+    }
+
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response, RequestProcessor processor) {
+        try {
+            processor.process(request, response);
+        } catch (Exception e) {
+            ExceptionHandler.handle(response, e);
+        }
     }
 }

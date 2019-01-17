@@ -1,12 +1,16 @@
-package controller.dto.meal;
+package domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+
+@Getter
+@Setter
 @AllArgsConstructor
-@Getter @Setter
-public class MealViewModel {
-    private Long id;
+public class OrderDetails {
+    private Long orderId;
+    private Long mealId;
     private String name;
     private String type;
+    private boolean isChosen;
 }

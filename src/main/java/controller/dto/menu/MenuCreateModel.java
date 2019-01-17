@@ -1,7 +1,8 @@
-package controller.dto.meal;
+package controller.dto.menu;
 
 import domain.MealType;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.Map;
@@ -9,6 +10,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class MenuCreateModel {
+    @NonNull
     private String date;
-    private Map<MealType, String> menu;
+    @NonNull
+    private Map<MealType, String> meals;
 }

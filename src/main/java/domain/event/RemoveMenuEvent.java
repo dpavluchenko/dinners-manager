@@ -7,6 +7,6 @@ import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
-public class RemoveMealEvent extends Event{
+public class RemoveMenuEvent extends Event{
     private LocalDate date;
 }

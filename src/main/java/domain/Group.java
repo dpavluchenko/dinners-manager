@@ -12,4 +12,5 @@ import lombok.Setter;
 public class Group extends Entity{
    private String name;
    private String dinnerTime;
+   private boolean isDefault;
 }

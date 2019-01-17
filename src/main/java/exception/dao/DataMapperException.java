@@ -1,4 +1,4 @@
-package exception;
+package exception.dao;
 
 public class DataMapperException extends RuntimeException {
 

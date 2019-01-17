@@ -12,12 +12,14 @@ public class User extends Entity{
     private String password;
     private String fullName;
     private UserRole role;
+    private Long groupId;
 
-    public User(String username, String password, String fullName, String role) {
+    public User(String username, String password, String fullName, String role, long groupId) {
         this.username = username;
         this.password = BCrypt.hashpw(password, BCrypt.gensalt());
         this.fullName = fullName;
         this.role = UserRole.valueOf(role);
+        this.groupId = groupId;
     }
 
     public boolean checkPasswordIdentity(String passForCheck){

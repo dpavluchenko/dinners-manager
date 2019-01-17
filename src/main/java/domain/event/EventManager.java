@@ -12,10 +12,6 @@ public class EventManager {
         listeners = new HashMap<>();
     }
 
-    public Map<Class<? extends Event>, List<EventListener>> getListeners() {
-        return listeners;
-    }
-
     public void subscribe(Class<? extends Event> eventClass, EventListener listener) {
         listeners.putIfAbsent(eventClass, new ArrayList<>());
         List<EventListener> eventListeners = listeners.get(eventClass);

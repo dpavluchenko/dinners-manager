@@ -4,7 +4,6 @@ import config.ApplicationProperties;
 import dao.function.ConnectionSupplier;
 import dao.function.StatementExecutor;
 import dao.function.TransactionExecutor;
-import exception.DataMapperException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,7 +24,7 @@ public abstract class AbstractDataMapper{
             PreparedStatement statement = connection.prepareStatement(sql);
             return executor.execute(statement);
         } catch (SQLException e) {
-           throw new DataMapperException(e);
+            throw ExceptionHelper.getEx(e);
         }
     }
 
@@ -38,10 +37,10 @@ public abstract class AbstractDataMapper{
               return result;
           } catch (SQLException e){
               connection.rollback();
-              throw new DataMapperException(e);
+              throw ExceptionHelper.getEx(e);
           }
         } catch (SQLException e) {
-            throw new DataMapperException(e);
+            throw ExceptionHelper.getEx(e);
         }
     }
 

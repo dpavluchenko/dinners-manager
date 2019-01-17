@@ -1,11 +1,11 @@
 package domain;
 
-import dao.client.MealDataMapper;
+import dao.client.DayMenuDataMapper;
 import dao.client.SimpleDataMapperFactory;
-import domain.event.AddMealEvent;
+import domain.event.AddMenuEvent;
 import domain.event.EventListener;
 import domain.event.EventManager;
-import domain.event.RemoveMealEvent;
+import domain.event.RemoveMenuEvent;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -53,8 +53,8 @@ public class DinnerCalendar {
     }
 
     private void initDates() {
-        MealDataMapper mealDataMapper = SimpleDataMapperFactory.getDataMapperFor(MealDataMapper.class);
-        LocalDate max = mealDataMapper.findMaxMealDate();
+        DayMenuDataMapper mapper = SimpleDataMapperFactory.getDataMapperFor(DayMenuDataMapper.class);
+        LocalDate max = mapper.findMaxMealDate();
         this.maxDate = max != null ? max : LocalDate.now();
         this.dateStorage.put(maxDate, maxDate);
     }
@@ -81,10 +81,10 @@ public class DinnerCalendar {
 
     private void subscribeToEvents() {
         EventManager eventManager = EventManager.getInstance();
-        EventListener<AddMealEvent> addMealListener = event -> addMealDate(event.getDate());
-        EventListener<RemoveMealEvent> removeMealListener = event -> removeMealDate(event.getDate());
-        eventManager.subscribe(AddMealEvent.class, addMealListener);
-        eventManager.subscribe(RemoveMealEvent.class, removeMealListener);
+        EventListener<AddMenuEvent> addMealListener = event -> addMealDate(event.getDate());
+        EventListener<RemoveMenuEvent> removeMealListener = event -> removeMealDate(event.getDate());
+        eventManager.subscribe(AddMenuEvent.class, addMealListener);
+        eventManager.subscribe(RemoveMenuEvent.class, removeMealListener);
     }
 
     static {
