@@ -21,6 +21,12 @@ public class HttpDataBinder {
         return getData(request, mapper.getTypeFactory().constructCollectionType(List.class, dataClass));
     }
 
+    public static String getParameterFromRequest(HttpServletRequest request, String name) {
+        String param = request.getParameter(name);
+        if (param == null) throw new DataReadException(String.format("Required param %s not found in request", name));
+        return param;
+    }
+
     public static void writeDataToResponse(Object data, HttpServletResponse response) {
         response.setContentType("application/json");
         try {

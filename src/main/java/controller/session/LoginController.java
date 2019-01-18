@@ -1,6 +1,7 @@
 package controller.session;
 
 import controller.BaseController;
+import controller.binder.HttpDataBinder;
 import dao.client.SimpleDataMapperFactory;
 import dao.client.UserDataMapper;
 import domain.User;
@@ -17,8 +18,8 @@ public class LoginController extends BaseController {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         processRequest(req, resp, (request, response) -> {
-            String username = request.getParameter("username");
-            String password = request.getParameter("password");
+            String username = HttpDataBinder.getParameterFromRequest(request,"username");
+            String password = HttpDataBinder.getParameterFromRequest(request,"password");
         UserDataMapper userDataMapper = SimpleDataMapperFactory.getDataMapperFor(UserDataMapper.class);
         User user = userDataMapper.findByUsername(username);
         if (user.isPresent() && user.checkPasswordIdentity(password)){

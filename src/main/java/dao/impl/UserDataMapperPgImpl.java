@@ -8,6 +8,7 @@ import domain.dto.UserInfo;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,22 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
     }
 
     @Override
+    public List<UserInfo> searchByFullName(String fullName) {
+        String sql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
+                " from users u, groups g where u.group_id = g.id" +
+                " and full_name ILIKE ?" +
+                " order by u.full_name";
+
+        String regex = '%' + fullName + '%';
+
+        return executeQuery(sql, ps -> {
+            ps.setString(1, regex);
+            ResultSet rs = ps.executeQuery();
+            return getUserInfos(rs);
+        });
+    }
+
+    @Override
     public Page<UserInfo> findAll(int pageNumber, int size) {
         int offset = pageNumber * size;
         return executeTransaction(connection -> {
@@ -69,14 +86,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
                 ps.setInt(1, size);
                 ps.setInt(2, offset);
                 ResultSet rs = ps.executeQuery();
-                List<UserInfo> users = new ArrayList<>();
-                while (rs.next()) {
-                    Long id = rs.getLong("id");
-                    String fullName = rs.getString("full_name");
-                    String groupName = rs.getString("group_name");
-                    String dinnerTime = rs.getString("dinner_time");
-                    users.add(new UserInfo(id, fullName, groupName, dinnerTime));
-                }
+                List<UserInfo> users = getUserInfos(rs);
                 page.setItems(users);
             }
 
@@ -105,6 +115,18 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
         });
         user.setId(id);
         return user;
+    }
+
+    private List<UserInfo> getUserInfos(ResultSet rs) throws SQLException {
+        List<UserInfo> users = new ArrayList<>();
+        while (rs.next()) {
+            Long id = rs.getLong("id");
+            String fullName = rs.getString("full_name");
+            String groupName = rs.getString("group_name");
+            String dinnerTime = rs.getString("dinner_time");
+            users.add(new UserInfo(id, fullName, groupName, dinnerTime));
+        }
+        return users;
     }
 
     public static UserDataMapper getInstance() {
