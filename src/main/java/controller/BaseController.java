@@ -16,6 +16,11 @@ public abstract class BaseController extends HttpServlet {
         return properties.getProperty("session.user.key");
     }
 
+    protected String getMethodName(HttpServletRequest request) {
+        String url = request.getRequestURI();
+        return url.substring(url.lastIndexOf("/") + 1);
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response, RequestProcessor processor) {
         try {
             processor.process(request, response);

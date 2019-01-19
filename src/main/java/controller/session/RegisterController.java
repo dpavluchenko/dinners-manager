@@ -30,7 +30,7 @@ public class RegisterController extends BaseController {
                     groupId));
             HttpSession session = request.getSession(true);
             session.setAttribute(getUserSessionKey(), new UserDetails(user));
-            response.setStatus(200);
+            response.setStatus(HttpServletResponse.SC_OK);
         });
     }
 }

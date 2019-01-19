@@ -25,8 +25,8 @@ public class LoginController extends BaseController {
         if (user.isPresent() && user.checkPasswordIdentity(password)){
             HttpSession session = request.getSession(true);
             session.setAttribute(getUserSessionKey(), new UserDetails(user));
-            response.setStatus(200);
-        } else response.setStatus(401);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         });
     }
 

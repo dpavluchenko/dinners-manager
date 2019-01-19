@@ -6,7 +6,6 @@ import dao.client.Page;
 import dao.client.SimpleDataMapperFactory;
 import dao.client.UserDataMapper;
 import domain.dto.UserInfo;
-import exception.controller.NotFoundRequestPath;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,11 +19,10 @@ public class UserController extends BaseController {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        String url = req.getRequestURI();
-        String method = url.substring(url.lastIndexOf("/") + 1);
+        String method = getMethodName(req);
         if (method.equals("list")) findAll(req, resp);
         else if (method.equals("search")) search(req, resp);
-        else throw new NotFoundRequestPath(String.format("Not allowed url %s", url));
+        else resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     @Override
