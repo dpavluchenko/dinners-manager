@@ -73,12 +73,12 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
 
     @Override
     public List<OrderStatistic> findStatisticByDate(LocalDate date) {
-        String sql = "select m.type, g.id as group_id, g.name as group_name, g.dinner_time," +
-                "count(o.meal_id) over (partition by g.name)" +
+        String sql = "select g.id as group_id, g.name as group_name, g.dinner_time, m.type, count(meal_id)" +
                 " from orders o, users u, groups g, meals m, day_menu d" +
                 " where d.date = ? and m.menu_id = d.id and o.meal_id = m.id" +
-                " and o.is_chosen = true and o.user_id = u.id" +
-                " and u.group_id = g.id";
+                " and o.is_chosen = true and o.user_id = u.id and u.group_id = g.id" +
+                " group by g.id, m.type" +
+                " order by g.id";
         return executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(date));
             ResultSet rs = ps.executeQuery();
@@ -90,9 +90,9 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
                 if (!statisticByGroup.containsKey(groupId)) {
                     String dinnerTime = rs.getString("dinner_time");
                     String groupName = rs.getString("group_name");
-                    Map<String, Integer> countByType = new HashMap<>();
-                    countByType.put(type, count);
-                    statisticByGroup.put(groupId, new OrderStatistic(groupName, dinnerTime, countByType));
+                    OrderStatistic os = new OrderStatistic(groupName, dinnerTime);
+                    os.getCountByType().put(type, count);
+                    statisticByGroup.put(groupId, os);
                 } else {
                     OrderStatistic os = statisticByGroup.get(groupId);
                     os.getCountByType().put(type, count);

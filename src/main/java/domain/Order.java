@@ -1,12 +1,14 @@
 package domain;
 
 import controller.dto.order.OrderSaveModel;
+import domain.dto.OrderStatistic;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -25,5 +27,10 @@ public class Order extends Entity{
             order.setId(model.getOrderId());
             return order;
         }).collect(Collectors.toList());
+    }
+
+    public static Map<String, Integer> calculateTotalOrders(List<OrderStatistic> statistics) {
+        return statistics.stream().flatMap(os -> os.getCountByType().entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (count1, count2) -> count1 + count2));
     }
 }
