@@ -39,7 +39,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public void update(Long id, Long groupId) {
-        executeQuery("update users set groupId = ? where id = ?", ps -> {
+        executeQuery("update users set group_id = ? where id = ?", ps -> {
             ps.setLong(1, groupId);
             ps.setLong(2, id);
             return ps.execute();
@@ -74,9 +74,9 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
     public Page<UserInfo> findAll(int pageNumber, int size) {
         int offset = pageNumber * size;
         return executeTransaction(connection -> {
-            String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
-                    "from users u, groups g where u.group_id = g.id" +
-                    "order by u.full_name limit ? offset ?";
+            String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name from users u, groups g" +
+                    " where u.group_id = g.id" +
+                    " order by u.full_name limit ? offset ?";
 
             String countSql = "select count(id) from users";
 
@@ -92,6 +92,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
             try (PreparedStatement ps = connection.prepareStatement(countSql)) {
                 ResultSet rs = ps.executeQuery();
+                rs.next();
                 int totalUsers = rs.getInt("count");
                 int totalPages = totalUsers / size;
                 page.setTotalPages(totalPages);

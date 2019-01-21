@@ -1,5 +1,6 @@
 package security;
 
+import config.ApplicationProperties;
 import domain.UserRole;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ public class SecurityConfig {
     private final List<RouteMatch> authenticatedRoutes;
     private final Map<UserRole, List<RouteMatch>> routesByRole;
 
-    private final String userAttrName = "userDetails";
+    private final String userAttrName = ApplicationProperties.getInstance().getProperty("session.user.key");
 
     private SecurityConfig(Builder builder) {
         this.permittedRoutes = builder.permittedRoutes;
@@ -25,7 +26,7 @@ public class SecurityConfig {
     }
 
     public int checkUserPermission(HttpServletRequest request) {
-        String route = request.getServletPath();
+        String route = request.getRequestURI();
 
         if (matchesPattern(permittedRoutes, route)) return HttpServletResponse.SC_OK;
 

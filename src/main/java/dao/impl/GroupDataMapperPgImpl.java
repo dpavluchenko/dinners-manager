@@ -1,8 +1,10 @@
 package dao.impl;
 
+import config.ApplicationProperties;
 import dao.client.GroupDataMapper;
 import domain.Group;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,9 +14,10 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     private static GroupDataMapper dataMapper = new GroupDataMapperPgImpl();
 
-    private final Long noneGroupId = -1L;
+    private final Long noneGroupId;
 
     private GroupDataMapperPgImpl() {
+        noneGroupId = Long.valueOf(ApplicationProperties.getInstance().getProperty("group.init.id"));
     }
 
     @Override
@@ -43,7 +46,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     @Override
     public Group create(Group group) {
-        String sql = "insert into groups (time, name, is_default) values (?, ?, ?) returning id";
+        String sql = "insert into groups (dinner_time, name, is_default) values (?, ?, ?) returning id";
         Long id = executeQuery(sql, ps -> {
             ps.setString(1, group.getDinnerTime());
             ps.setString(2, group.getName());
@@ -68,15 +71,24 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     @Override
     public void delete(Long id) {
-        executeQuery("delete from groups where id = ?", ps -> {
-            ps.setLong(1, id);
-            return ps.execute();
+        executeTransaction(connection -> {
+            try (PreparedStatement ps = connection.prepareStatement("update users set group_id = ? where group_id = ?")) {
+                ps.setLong(1, noneGroupId);
+                ps.setLong(2, id);
+                ps.execute();
+            }
+            try (PreparedStatement ps = connection.prepareStatement("delete from groups where id = ?")) {
+                ps.setLong(1, id);
+                ps.execute();
+            }
+            return id;
         });
     }
 
     @Override
     public List<Group> findAll() {
-        return executeQuery("select * from groups", ps -> {
+        return executeQuery("select * from groups where id != ?", ps -> {
+            ps.setLong(1, noneGroupId);
             ResultSet rs = ps.executeQuery();
             List<Group> groups = new ArrayList<>();
             while (rs.next()) {

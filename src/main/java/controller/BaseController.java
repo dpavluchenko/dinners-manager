@@ -17,8 +17,7 @@ public abstract class BaseController extends HttpServlet {
     }
 
     protected String getMethodName(HttpServletRequest request) {
-        String url = request.getRequestURI();
-        return url.substring(url.lastIndexOf("/") + 1);
+        return request.getPathInfo().replaceAll("/", "");
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response, RequestProcessor processor) {

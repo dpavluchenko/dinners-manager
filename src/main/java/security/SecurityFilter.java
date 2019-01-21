@@ -14,11 +14,11 @@ public class SecurityFilter implements Filter {
     private SecurityConfig securityConfig;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         this.securityConfig = SecurityConfig
                 .create()
                 .permitAll("/api/login", "/api/logout", "/api/register")
-                .authenticated("/api", "/api/manage/*")
+                .authenticated("/api/orders/*", "/api/manage/*")
                 .hasRole(UserRole.MANAGER, "/api/manage/*")
                 .build();
     }

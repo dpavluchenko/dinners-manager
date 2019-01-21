@@ -8,7 +8,4 @@ import lombok.Setter;
 public abstract class Entity {
     protected Long id;
 
-    public boolean isPresent() {
-        return id != null;
-    }
 }

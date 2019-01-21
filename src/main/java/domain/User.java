@@ -22,6 +22,10 @@ public class User extends Entity{
         this.groupId = groupId;
     }
 
+    public boolean isPresent() {
+        return id != null;
+    }
+
     public boolean checkPasswordIdentity(String passForCheck){
        return BCrypt.checkpw(passForCheck, password);
     }

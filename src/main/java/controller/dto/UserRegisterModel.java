@@ -8,7 +8,10 @@ import lombok.Setter;
 public class UserRegisterModel {
     @NonNull
     private String username;
+    @NonNull
     private String password;
+    @NonNull
     private String fullName;
+    @NonNull
     private String role;
 }

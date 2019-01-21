@@ -29,6 +29,7 @@ public class HttpDataBinder {
 
     public static void writeDataToResponse(Object data, HttpServletResponse response) {
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
             response.getWriter()
                     .write(
