@@ -12,5 +12,5 @@ public class OrderDetails {
     private Long mealId;
     private String name;
     private String type;
-    private boolean isChosen;
+    private boolean chosen;
 }

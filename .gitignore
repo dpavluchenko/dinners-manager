@@ -16,6 +16,12 @@
 *.iws
 *.iml
 *.ipr
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
 /out/
 
 ### NetBeans ###
@@ -46,6 +52,9 @@ gradle-app.setting
 
 # Log file
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Package Files #
 *.jar
@@ -103,3 +112,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.DS_Store
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local

@@ -11,5 +11,5 @@ public class OrderSaveModel {
     private Long orderId;
     @NonNull
     private Long mealId;
-    private boolean isChosen;
+    private boolean chosen;
 }

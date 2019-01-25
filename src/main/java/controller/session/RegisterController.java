@@ -13,6 +13,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
+
 @WebServlet(urlPatterns = "/api/register", name = "register")
 public class RegisterController extends BaseController {
 
@@ -29,8 +32,13 @@ public class RegisterController extends BaseController {
                     model.getRole(),
                     groupId));
             HttpSession session = request.getSession(true);
-            session.setAttribute(getUserSessionKey(), new UserDetails(user));
+            UserDetails userDetails = new UserDetails(user);
+            Map<String, String> userInfo = new HashMap<>();
+            userInfo.put("name", userDetails.getFullName());
+            userInfo.put("role", userDetails.getRole().name());
+            session.setAttribute(getUserSessionKey(), userDetails);
             response.setStatus(HttpServletResponse.SC_OK);
+            HttpDataBinder.writeDataToResponse(userInfo, response);
         });
     }
 }

@@ -32,6 +32,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
                 user.setPassword(rs.getString("password"));
                 user.setRole(UserRole.valueOf(rs.getString("role")));
                 user.setUsername(username);
+                user.setGroupId(rs.getLong("group_id"));
             }
             return user;
         });
@@ -93,8 +94,8 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
             try (PreparedStatement ps = connection.prepareStatement(countSql)) {
                 ResultSet rs = ps.executeQuery();
                 rs.next();
-                int totalUsers = rs.getInt("count");
-                int totalPages = totalUsers / size;
+                double totalUsers = rs.getDouble("count");
+                int totalPages = (int) Math.ceil(totalUsers / size);
                 page.setTotalPages(totalPages);
             }
             return page;
