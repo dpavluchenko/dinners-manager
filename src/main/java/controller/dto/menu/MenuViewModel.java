@@ -15,4 +15,5 @@ public class MenuViewModel {
     private String day;
     private String date;
     private Map<MealType, String> meals;
+    public static final int CURRENT_MENU_DAYS = 10;
 }

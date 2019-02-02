@@ -1,5 +1,8 @@
 package config;
 
+import dao.client.GroupDataMapper;
+import dao.client.SimpleDataMapperFactory;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -14,6 +17,8 @@ public class ApplicationInitializer implements ServletContextListener {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Can't init application classes", e);
         }
+        SimpleDataMapperFactory.getDataMapperFor(GroupDataMapper.class)
+        .init();
     }
 
     @Override

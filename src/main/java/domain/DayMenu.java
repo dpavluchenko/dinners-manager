@@ -36,10 +36,12 @@ public class DayMenu extends Entity {
                  DateUtil.dateToString(m.getDate()), m.getMeals())).collect(Collectors.toList());
     }
 
-    public static Period findMenuPeriod(String from, String to) {
-        if (from != null && !from.isEmpty()) {
-            return new Period(DateUtil.parseLocalDate(from), DateUtil.parseLocalDate(to));
+    public static Period findMenuPeriod(int days) {
+        Period period = DinnerCalendar.getInstance().findMenuPeriod();
+        int diff = period.calcBetweenPeriod();
+        if (diff < days) {
+            period.minusStartDate(days - diff);
         }
-        return DinnerCalendar.getInstance().findMenuPeriod();
+        return period;
     }
 }

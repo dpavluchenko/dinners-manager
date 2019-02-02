@@ -5,6 +5,8 @@ import domain.Group;
 import java.util.List;
 
 public interface GroupDataMapper extends DataMapper<Long, Group>{
+    void init();
+
     void setDefaultGroup(Long groupId);
 
     Long getDefaultGroupId();

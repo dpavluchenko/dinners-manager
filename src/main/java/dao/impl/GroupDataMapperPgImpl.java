@@ -21,6 +21,18 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
     }
 
     @Override
+    public void init() {
+        String sql = "insert into groups (id, dinner_time, name, is_default)" +
+                "values (?, '', ?, false)" +
+                "on conflict (id)  do nothing ";
+        executeQuery(sql, ps -> {
+            ps.setLong(1, noneGroupId);
+            ps.setString(2, ApplicationProperties.getInstance().getProperty("group.init.name"));
+            return ps.execute();
+        });
+    }
+
+    @Override
     public void setDefaultGroup(Long groupId) {
         String sql = "update groups set is_default = case" +
                 "                  when id = ? then true" +

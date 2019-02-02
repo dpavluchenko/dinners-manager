@@ -8,7 +8,6 @@ import controller.dto.menu.MenuViewModel;
 import dao.client.DayMenuDataMapper;
 import dao.client.SimpleDataMapperFactory;
 import domain.DayMenu;
-import domain.DinnerCalendar;
 import domain.event.AddMenuEvent;
 import domain.event.EventManager;
 import domain.event.RemoveMenuEvent;
@@ -35,7 +34,7 @@ public class DayMenuController extends BaseController {
             if (date != null) {
                 modelsToResp = DayMenu.convert(dayMenuDataMapper.findByDate(DateUtil.parseLocalDate(date)));
             } else {
-                modelsToResp = DayMenu.convert(dayMenuDataMapper.findByPeriod(DinnerCalendar.getInstance().findMenuPeriod()));
+                modelsToResp = DayMenu.convert(dayMenuDataMapper.findByPeriod(DayMenu.findMenuPeriod(MenuViewModel.CURRENT_MENU_DAYS)));
             }
             HttpDataBinder.writeDataToResponse(modelsToResp, response);
         });
