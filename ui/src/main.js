@@ -5,10 +5,13 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import Notifications from 'vue-notification'
 
 axios.defaults.withCredentials = true
+
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
+Vue.use(Notifications)
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 

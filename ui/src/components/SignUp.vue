@@ -60,7 +60,7 @@
                                     block
                                     :disabled="!valid"
                                     color="success"
-                                    @click="validate"
+                                    @click="signUp"
                             >
                                 Зарегистрироватся
                             </v-btn>
@@ -82,6 +82,8 @@
 </template>
 
 <script>
+    import {handleError} from '../helpers/errorHandler'
+
     export default {
         name: 'SignUp',
         data: () => ({
@@ -92,7 +94,7 @@
             password: '',
             authRules: [
                 v => !!v || 'Заполните, пожалуйста, это поле',
-                v => /[a-zA-Z0-9\-_]$/.test(v) || 'Допускаются только латинские символы без пробелов',
+                v => /[a-zA-Z0-9\-_]$/.test(v) || 'Допускаются только латинские символы и цифры без пробелов',
                 v => (v && v.length <= 15 && v.length >= 6) || 'Значение должно быть не меньше 6 и не больше 15 символов'
             ],
             nameRules: [
@@ -124,23 +126,28 @@
             }
         },
         methods: {
-            validate() {
-                if (this.$refs.form.validate()) {
-                    this.snackbar = true
-                }
-            },
             reset() {
                 this.$refs.form.reset()
             },
-            resetValidation() {
-                this.$refs.form.resetValidation()
+            signUp() {
+                this.$store.dispatch('signUp', {
+                    "username": this.username,
+                    "password": this.password,
+                    "role": this.selectedRole,
+                    "fullName": this.fullName
+                }).then(() => {
+                    this.$notify({type: 'success', text: 'Вы успешно зарегистрировались!'})
+                    this.$router.push('/menu')
+                }).catch((e) => {
+                    handleError(this, e.response)
+                })
             }
         }
     }
 </script>
 
 <style scoped>
-    .rounded-card{
-        border-radius:10px;
+    .rounded-card {
+        border-radius: 10px;
     }
 </style>
