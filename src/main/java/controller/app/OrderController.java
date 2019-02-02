@@ -38,7 +38,8 @@ public class OrderController extends BaseController {
         processRequest(req, resp, (request, response) -> {
             UserDetails userDetails = (UserDetails) request.getSession(false).getAttribute(getUserSessionKey());
             List<OrderSaveModel> models = HttpDataBinder.getListOfModelsFromRequest(request, OrderSaveModel.class);
-            orderDataMapper.save(Order.convertTo(models, userDetails.getUserId()));
+            List<Order> newOrders = orderDataMapper.save(Order.convertTo(models, userDetails.getUserId()));
+            HttpDataBinder.writeDataToResponse(Order.convertTo(newOrders), response);
         });
     }
 

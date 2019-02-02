@@ -8,10 +8,8 @@ import domain.Period;
 import domain.dto.MenuDetails;
 import exception.dao.NotFoundDataMapperException;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -75,6 +73,20 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
     }
 
     @Override
+    public List<MenuDetails> findByDate(LocalDate date) {
+        String sql = "select d.id as menu_id, d.date, m.type, m.name " +
+                " from day_menu as d, meals as m" +
+                " where d.date=?" +
+                " and d.id=m.menu_id ";
+
+        return executeQuery(sql, ps -> {
+            ps.setDate(1, Date.valueOf(date));
+            ResultSet rs = ps.executeQuery();
+            return getMenuDetails(rs);
+        });
+    }
+
+    @Override
     public List<MenuDetails> findByPeriod(Period period) {
         String sql = "select d.id as menu_id, d.date, m.type, m.name " +
                 " from day_menu as d, meals as m" +
@@ -86,25 +98,7 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
             ps.setDate(1, Date.valueOf(period.getStartDate()));
             ps.setDate(2, Date.valueOf(period.getEndDate()));
             ResultSet rs = ps.executeQuery();
-            Map<Long, MenuDetails> details = new HashMap<>();
-            while (rs.next()) {
-                Long menuId = rs.getLong("menu_id");
-                MealType type = MealType.valueOf(rs.getString("type"));
-                String name = rs.getString("name");
-                if (!details.containsKey(menuId)) {
-                    Map<MealType, String> meals = new HashMap<>();
-                    meals.put(type, name);
-                    LocalDate date = rs.getDate("date").toLocalDate();
-                    MenuDetails menuDetails = new MenuDetails(menuId, date, meals);
-                    details.put(menuId, menuDetails);
-                } else {
-                    MenuDetails menuDetails = details.get(menuId);
-                    menuDetails.getMeals().put(type, name);
-                }
-            }
-            List<MenuDetails> menuDetails = new ArrayList<>(details.values());
-            menuDetails.sort(Comparator.comparing(MenuDetails::getDate));
-            return menuDetails;
+            return getMenuDetails(rs);
         });
     }
 
@@ -115,6 +109,28 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
             resultSet.next();
             return resultSet.getDate("date").toLocalDate();
         });
+    }
+
+    private List<MenuDetails> getMenuDetails(ResultSet rs) throws SQLException {
+        Map<Long, MenuDetails> details = new HashMap<>();
+        while (rs.next()) {
+            Long menuId = rs.getLong("menu_id");
+            MealType type = MealType.valueOf(rs.getString("type"));
+            String name = rs.getString("name");
+            if (!details.containsKey(menuId)) {
+                Map<MealType, String> meals = new HashMap<>();
+                meals.put(type, name);
+                LocalDate date = rs.getDate("date").toLocalDate();
+                MenuDetails menuDetails = new MenuDetails(menuId, date, meals);
+                details.put(menuId, menuDetails);
+            } else {
+                MenuDetails menuDetails = details.get(menuId);
+                menuDetails.getMeals().put(type, name);
+            }
+        }
+        List<MenuDetails> menuDetails = new ArrayList<>(details.values());
+        menuDetails.sort(Comparator.comparing(MenuDetails::getDate));
+        return menuDetails;
     }
 
     public static DayMenuDataMapper getInstance() {

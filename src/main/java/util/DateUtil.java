@@ -3,6 +3,8 @@ package util;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public class DateUtil {
 
@@ -18,27 +20,10 @@ public class DateUtil {
 
     public static String getDayOfWeek(LocalDate date) {
         if (date.isEqual(LocalDate.now())) {
-            return "Сегодня";
+            return "Today";
         } else {
             DayOfWeek dayOfWeek = date.getDayOfWeek();
-            switch (dayOfWeek) {
-                case MONDAY:
-                    return "Понедельник";
-                case TUESDAY:
-                    return "Вторник";
-                case WEDNESDAY:
-                    return "Среда";
-                case THURSDAY:
-                    return "Четверг";
-                case FRIDAY:
-                    return "Пятница";
-                case SATURDAY:
-                    return "Суббота";
-                case SUNDAY:
-                    return "Воскресенье";
-                default:
-                    return "";
-            }
+            return dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         }
     }
 }

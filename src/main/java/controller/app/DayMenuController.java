@@ -8,7 +8,7 @@ import controller.dto.menu.MenuViewModel;
 import dao.client.DayMenuDataMapper;
 import dao.client.SimpleDataMapperFactory;
 import domain.DayMenu;
-import domain.Period;
+import domain.DinnerCalendar;
 import domain.event.AddMenuEvent;
 import domain.event.EventManager;
 import domain.event.RemoveMenuEvent;
@@ -30,8 +30,13 @@ public class DayMenuController extends BaseController {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         processRequest(req, resp, (request, response) -> {
-            Period period = DayMenu.findMenuPeriod(request.getParameter("from"), request.getParameter("to"));
-            List<MenuViewModel> modelsToResp = DayMenu.convert(dayMenuDataMapper.findByPeriod(period));
+            String date = request.getParameter("date");
+            List<MenuViewModel> modelsToResp;
+            if (date != null) {
+                modelsToResp = DayMenu.convert(dayMenuDataMapper.findByDate(DateUtil.parseLocalDate(date)));
+            } else {
+                modelsToResp = DayMenu.convert(dayMenuDataMapper.findByPeriod(DinnerCalendar.getInstance().findMenuPeriod()));
+            }
             HttpDataBinder.writeDataToResponse(modelsToResp, response);
         });
     }

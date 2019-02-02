@@ -17,7 +17,7 @@ public interface OrderDataMapper extends DataMapper<Long, Order>{
 
     List<GroupOrderDetails> findAllInGroup(Long groupId, LocalDate date);
 
-    void save(List<Order> orders);
+    List<Order> save(List<Order> orders);
 
     void clear();
 }

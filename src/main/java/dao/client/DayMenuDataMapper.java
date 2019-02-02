@@ -15,5 +15,6 @@ public interface DayMenuDataMapper extends DataMapper<Long, DayMenu>{
     void update(Long id, Map<MealType, String> meals);
     LocalDate delete(Long id);
     List<MenuDetails> findByPeriod(Period period);
+    List<MenuDetails> findByDate(LocalDate date);
     LocalDate findMaxMealDate();
 }

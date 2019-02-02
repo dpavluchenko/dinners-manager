@@ -22,14 +22,19 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
 
     private OrderDataMapperPgImpl(){}
 
+    /**
+     *
+     * @param orders to save
+     * @return orders which was new
+     */
     @Override
-    public void save(List<Order> orders) {
+    public List<Order> save(List<Order> orders) {
         List<Order> newOrders = orders.stream().filter(order -> order.getId().equals(notExistedOrderId)).collect(Collectors.toList());
         List<Order> oldOrders = orders.stream().filter(order -> !order.getId().equals(notExistedOrderId)).collect(Collectors.toList());
-        executeTransaction(connection -> {
-           if (!newOrders.isEmpty()) insert(connection, newOrders);
+        return executeTransaction(connection -> {
            if (!oldOrders.isEmpty()) update(connection, oldOrders);
-           return null;
+            if (!newOrders.isEmpty()) return insert(connection, newOrders);
+            else return Collections.emptyList();
         });
     }
 
@@ -145,17 +150,19 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
         }
     }
 
-    private void insert(Connection connection, List<Order> orders) throws SQLException {
+    private List<Order> insert(Connection connection, List<Order> orders) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement(
-                "insert into orders (user_id, meal_id, is_chosen) values (?, ?, ?)")) {
+                "insert into orders (user_id, meal_id, is_chosen) values (?, ?, ?) returning id")) {
 
             for (Order order : orders) {
                 ps.setLong(1, order.getUserId());
                 ps.setLong(2, order.getMealId());
                 ps.setBoolean(3, order.isChosen());
-                ps.addBatch();
+                ResultSet rs = ps.executeQuery();
+                rs.next();
+                order.setId(rs.getLong("id"));
             }
-            ps.executeBatch();
+            return orders;
         }
     }
 

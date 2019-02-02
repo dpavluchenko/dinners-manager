@@ -29,6 +29,16 @@ public class Order extends Entity{
         }).collect(Collectors.toList());
     }
 
+    public static List<OrderSaveModel> convertTo(List<Order> orders) {
+        return orders.stream().map(o -> {
+            OrderSaveModel model = new OrderSaveModel();
+            model.setOrderId(o.id);
+            model.setMealId(o.mealId);
+            model.setChosen(o.isChosen());
+            return model;
+        }).collect(Collectors.toList());
+    }
+
     public static Map<String, Integer> calculateTotalOrders(List<OrderStatistic> statistics) {
         return statistics.stream().flatMap(os -> os.getCountByType().entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (count1, count2) -> count1 + count2));
