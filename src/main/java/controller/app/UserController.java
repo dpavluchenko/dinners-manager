@@ -10,7 +10,6 @@ import domain.dto.UserInfo;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @WebServlet(urlPatterns = "/api/manage/users/*", name = "users")
 public class UserController extends BaseController {
@@ -54,7 +53,9 @@ public class UserController extends BaseController {
     private void search(HttpServletRequest req, HttpServletResponse resp) {
         processRequest(req, resp, (request, response) -> {
             String fullName = HttpDataBinder.getParameterFromRequest(request,"fullName");
-            List<UserInfo> users = userDataMapper.searchByFullName(fullName);
+            int page = Integer.valueOf(HttpDataBinder.getParameterFromRequest(request, "page"));
+            int size = Integer.valueOf(HttpDataBinder.getParameterFromRequest(request, "size"));
+            Page<UserInfo> users = userDataMapper.searchByFullName(fullName, page, size);
             HttpDataBinder.writeDataToResponse(users, response);
         });
     }

@@ -6,6 +6,7 @@ import domain.User;
 import domain.UserRole;
 import domain.dto.UserInfo;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,7 +57,8 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
     }
 
     @Override
-    public List<UserInfo> searchByFullName(String fullName) {
+    public Page<UserInfo> searchByFullName(String fullName, int pageNumber, int size) {
+        int offset = pageNumber * size;
         String sql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
                 " from users u, groups g where u.group_id = g.id" +
                 " and full_name ILIKE ?" +
@@ -64,10 +66,31 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
         String regex = '%' + fullName + '%';
 
-        return executeQuery(sql, ps -> {
-            ps.setString(1, regex);
-            ResultSet rs = ps.executeQuery();
-            return getUserInfos(rs);
+        return executeTransaction(connection -> {
+            String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
+                    " from users u, groups g where u.group_id = g.id" +
+                    " and full_name ILIKE ?" +
+                    " order by u.full_name limit ? offset ?";
+
+            String countSql = "select count(id) from users where full_name ILIKE ?";
+
+            Page<UserInfo> page = new Page<>(pageNumber, size);
+
+            try (PreparedStatement ps = connection.prepareStatement(selectSql)) {
+                ps.setString(1, regex);
+                ps.setInt(2, size);
+                ps.setInt(3, offset);
+                ResultSet rs = ps.executeQuery();
+                List<UserInfo> users = getUserInfos(rs);
+                page.setItems(users);
+            }
+
+            if (page.getItems().size() >= size) {
+                page.setTotalPages(countTotalPages(connection, countSql, size));
+            } else {
+                page.setTotalPages((int) Math.ceil((double) page.getItems().size() / size));
+            }
+            return page;
         });
     }
 
@@ -90,14 +113,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
                 List<UserInfo> users = getUserInfos(rs);
                 page.setItems(users);
             }
-
-            try (PreparedStatement ps = connection.prepareStatement(countSql)) {
-                ResultSet rs = ps.executeQuery();
-                rs.next();
-                double totalUsers = rs.getDouble("count");
-                int totalPages = (int) Math.ceil(totalUsers / size);
-                page.setTotalPages(totalPages);
-            }
+            page.setTotalPages(countTotalPages(connection, countSql, size));
             return page;
         });
     }
@@ -129,6 +145,15 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
             users.add(new UserInfo(id, fullName, groupName, dinnerTime));
         }
         return users;
+    }
+
+    private int countTotalPages(Connection connection, String countSql, int size) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(countSql)) {
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            double totalUsers = rs.getDouble("count");
+            return (int) Math.ceil(totalUsers / size);
+        }
     }
 
     public static UserDataMapper getInstance() {

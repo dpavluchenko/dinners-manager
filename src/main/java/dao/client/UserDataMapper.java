@@ -3,8 +3,6 @@ package dao.client;
 import domain.User;
 import domain.dto.UserInfo;
 
-import java.util.List;
-
 public interface UserDataMapper extends DataMapper<Long, User>{
     User create(User user);
 
@@ -14,7 +12,7 @@ public interface UserDataMapper extends DataMapper<Long, User>{
 
     void delete(Long id);
 
-    List<UserInfo> searchByFullName(String fullName);
+    Page<UserInfo> searchByFullName(String fullName, int pageNumber, int size);
 
     Page<UserInfo> findAll(int pageNumber, int size);
 }
