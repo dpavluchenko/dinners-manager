@@ -19,5 +19,4 @@ public interface OrderDataMapper extends DataMapper<Long, Order>{
 
     List<Order> save(List<Order> orders);
 
-    void clear();
 }

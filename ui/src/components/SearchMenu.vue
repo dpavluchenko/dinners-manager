@@ -42,7 +42,7 @@
                                                 prepend-icon="event"
                                                 readonly
                                         ></v-text-field>
-                                        <v-date-picker v-model="pickerDate" @input="picker = false"></v-date-picker>
+                                        <v-date-picker v-model="pickerDate" locale="ru" @input="picker = false"></v-date-picker>
                                     </v-menu>
                                 </v-flex>
                                 <v-spacer></v-spacer>

@@ -49,7 +49,10 @@ public class DinnerCalendar {
 
     private void removeMealDate(LocalDate date) {
         dateStorage.remove(date);
-        if (date.isEqual(maxDate)) maxDate = Collections.max(dateStorage.keySet());
+        if (date.isEqual(maxDate)) {
+            if (!dateStorage.isEmpty()) maxDate = Collections.max(dateStorage.keySet());
+            else initDates();
+        }
     }
 
     private void initDates() {

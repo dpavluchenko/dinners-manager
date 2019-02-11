@@ -38,7 +38,7 @@
                                                 prepend-icon="event"
                                                 readonly
                                         ></v-text-field>
-                                        <v-date-picker v-model="date" @input="picker = false"></v-date-picker>
+                                        <v-date-picker v-model="date" locale="ru" @input="picker = false"></v-date-picker>
                                     </v-menu>
                                     <v-text-field
                                             v-model="menu.meals.FIRST_DISH"

@@ -32,7 +32,8 @@
                                             prepend-icon="event"
                                             readonly
                                     ></v-text-field>
-                                    <v-date-picker v-model="pickerDate" @input="picker = false"></v-date-picker>
+                                    <v-date-picker v-model="pickerDate" locale="ru"
+                                                   @input="picker = false"></v-date-picker>
                                 </v-menu>
                             </v-layout>
                         </v-form>
@@ -128,13 +129,11 @@
                 return `${day.padStart(2, '0')}.${month.padStart(2, '0')}.${year}`
             },
             getStat() {
-                if (this.$refs.form.validate()) {
-                    this.axios.get('/api/manage/stats?date='.concat(this.date))
-                        .then(response => {
-                            this.tableData = this.convertData(response.data)
-                        })
-                        .catch(error => handleError(this, error.response))
-                }
+                this.axios.get('/api/manage/stats?date='.concat(this.date))
+                    .then(response => {
+                        this.tableData = this.convertData(response.data)
+                    })
+                    .catch(error => handleError(this, error.response))
             }
         },
         mounted() {

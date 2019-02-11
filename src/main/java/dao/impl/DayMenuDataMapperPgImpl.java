@@ -9,7 +9,9 @@ import domain.dto.MenuDetails;
 import exception.dao.NotFoundDataMapperException;
 
 import java.sql.Date;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -107,7 +109,9 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
         return executeQuery("select max(date) date from day_menu", ps -> {
             ResultSet resultSet = ps.executeQuery();
             resultSet.next();
-            return resultSet.getDate("date").toLocalDate();
+            Date date = resultSet.getDate("date");
+            if (date != null) return date.toLocalDate();
+            else return null;
         });
     }
 
@@ -137,12 +141,4 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
         return dataMapper;
     }
 
-    @Override
-    public void clear() {
-        try (Connection connection = connectionSupplier.getConnection()) {
-            connection.prepareStatement("delete from day_menu").execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

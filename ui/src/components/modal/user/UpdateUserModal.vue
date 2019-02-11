@@ -22,6 +22,7 @@
                                             :items="groupNames"
                                             v-model="selectedGroup"
                                             box
+                                            no-data-text="Нет ни одной группы"
                                             :rules="rules"
                                             prepend-icon="group"
                                             label="Выберите группу для пользователя"

@@ -141,15 +141,6 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
         });
     }
 
-    @Override
-    public void clear() {
-        try (Connection connection = connectionSupplier.getConnection()) {
-            connection.prepareStatement("delete from orders").execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private List<Order> insert(Connection connection, List<Order> orders) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement(
                 "insert into orders (user_id, meal_id, is_chosen) values (?, ?, ?) returning id")) {

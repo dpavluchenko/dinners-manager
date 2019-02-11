@@ -58,15 +58,9 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public Page<UserInfo> searchByFullName(String fullName, int pageNumber, int size) {
-        int offset = pageNumber * size;
-        String sql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
-                " from users u, groups g where u.group_id = g.id" +
-                " and full_name ILIKE ?" +
-                " order by u.full_name";
-
-        String regex = '%' + fullName + '%';
-
         return executeTransaction(connection -> {
+            int offset = (pageNumber - 1) * size;
+            String regex = '%' + fullName + '%';
             String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
                     " from users u, groups g where u.group_id = g.id" +
                     " and full_name ILIKE ?" +
@@ -96,8 +90,8 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public Page<UserInfo> findAll(int pageNumber, int size) {
-        int offset = pageNumber * size;
         return executeTransaction(connection -> {
+            int offset = (pageNumber - 1) * size;
             String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name from users u, groups g" +
                     " where u.group_id = g.id" +
                     " order by u.full_name limit ? offset ?";
