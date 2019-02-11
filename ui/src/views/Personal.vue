@@ -2,8 +2,9 @@
     <div>
         <v-tabs
                 centered
-                color='teal lighten-2'
+                color="blue darken-1"
                 dark
+                class="rounded-tab"
                 icons-and-text
         >
             <v-tabs-slider color='yellow'></v-tabs-slider>
@@ -58,5 +59,7 @@
 </script>
 
 <style scoped>
-
+    .rounded-tab {
+        border-radius: 10px;
+    }
 </style>

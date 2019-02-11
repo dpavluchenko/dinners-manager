@@ -1,10 +1,17 @@
 <template>
-    <v-container align-center align-content-center
-                 fill-height>
-        <v-layout align-center justify-center>
-            <v-flex xs12 sm8 md4>
+    <v-container fluid>
+        <v-layout align-center justify-center row>
+            <v-flex xs12 md6 lg4>
                 <v-card class="rounded-card elevation-10" dark>
-
+                    <v-card-media>
+                        <v-img  max-height="240px"
+                                contain
+                                :src="require('.././assets/broccoli2.png')"
+                                aspect-ratio="1"
+                                class="grey lighten-2 hidden-sm-and-down"
+                        >
+                        </v-img>
+                    </v-card-media>
                     <v-form class="mx-4 my-4"
                             ref="form"
                             v-model="valid"

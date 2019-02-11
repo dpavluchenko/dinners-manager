@@ -1,9 +1,17 @@
 <template>
     <v-container fluid fill-height>
         <v-layout align-center justify-center>
-            <v-flex xs12 sm8 md4>
+            <v-flex xs12 md6 lg4>
                 <v-card dark class="rounded-card elevation-10">
-
+                    <v-card-media>
+                        <v-img  max-height="200px"
+                                contain
+                                :src="require('.././assets/peas2.png')"
+                                aspect-ratio="1"
+                                class="grey lighten-2 hidden-md-and-down"
+                        >
+                        </v-img>
+                    </v-card-media>
                     <v-form class="mx-4 my-4"
                             ref="form"
                             v-model="valid"

@@ -9,14 +9,14 @@ export default {
     Tue: {
         day: 'Вторник',
         colors: {
-            card: 'indigo accent-2',
+            card: 'indigo accent-1',
             checkbox: 'amber'
         },
     },
     Wed: {
         day: 'Среда',
         colors: {
-            card: 'blue lighten-1',
+            card: 'blue lighten-2',
             checkbox: 'yellow lighten-1'
         },
     },

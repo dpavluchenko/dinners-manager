@@ -1,5 +1,5 @@
 <template>
-    <v-toolbar dark color="primary">
+    <v-toolbar fixed flat dark color="primary">
         <v-toolbar-title class="white--text" v-if="userFullName">Здравствуй, {{userFullName}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>

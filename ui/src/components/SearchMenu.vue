@@ -52,7 +52,6 @@
                     <v-snackbar
                             v-model="snackbar"
                             multi-line
-                            timeout="4000"
                             top
                     >
                         Введите дату!

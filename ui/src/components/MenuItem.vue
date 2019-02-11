@@ -6,7 +6,7 @@
     >
         <v-layout align-space-between justify-space-between column fill-height>
             <v-flex xs12>
-                <v-card :color="colors.card" class="black--text rounded-card">
+                <v-card :color="colors.card" class="black--text rounded-card elevation-15">
                     <v-layout>
                         <v-flex xs12>
                             <v-card-text>
