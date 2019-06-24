@@ -2,9 +2,6 @@
 
 Simple dinner order management application for company employees
 
-# Try it  http://35.199.159.18/
-
-
 ## Description
 
 Register as a manager and be able to add a new menu, distribute users into groups, view order statistics.
