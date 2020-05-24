@@ -1,7 +1,9 @@
 package com.pavliuchenko.dao.impl;
 
 import com.pavliuchenko.dao.client.GroupDataMapper;
+import com.pavliuchenko.dao.source.DatabaseSource;
 import com.pavliuchenko.domain.Group;
+import com.pavliuchenko.infrastructure.annotation.InjectType;
 import com.pavliuchenko.infrastructure.annotation.Property;
 import com.pavliuchenko.infrastructure.annotation.Singleton;
 
@@ -12,7 +14,10 @@ import java.util.Comparator;
 import java.util.List;
 
 @Singleton
-public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDataMapper {
+public class GroupDataMapperPgImpl implements GroupDataMapper {
+
+    @InjectType
+    private DatabaseSource databaseSource;
 
     @Property("group.init.id")
     private Long noneGroupId;
@@ -25,7 +30,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
         String sql = "insert into groups (id, dinner_time, name, is_default)" +
                 "values (?, '', ?, false)" +
                 "on conflict (id)  do nothing ";
-        executeQuery(sql, ps -> {
+        databaseSource.executeQuery(sql, ps -> {
             ps.setLong(1, noneGroupId);
             ps.setString(2, noneGroupName);
             return ps.execute();
@@ -38,7 +43,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
                 "                  when id = ? then true" +
                 "                  else false" +
                 "  end";
-        executeQuery(sql, ps -> {
+        databaseSource.executeQuery(sql, ps -> {
             ps.setLong(1, groupId);
             return ps.execute();
         });
@@ -46,7 +51,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     @Override
     public Long getDefaultGroupId() {
-        Long id = executeQuery("select id from groups where is_default=true", ps -> {
+        Long id = databaseSource.executeQuery("select id from groups where is_default=true", ps -> {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getLong("id");
@@ -59,7 +64,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
     @Override
     public Group create(Group group) {
         String sql = "insert into groups (dinner_time, name, is_default) values (?, ?, ?) returning id";
-        Long id = executeQuery(sql, ps -> {
+        Long id = databaseSource.executeQuery(sql, ps -> {
             ps.setString(1, group.getDinnerTime());
             ps.setString(2, group.getName());
             ps.setBoolean(3, group.isDefault());
@@ -73,7 +78,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     @Override
     public void update(Group group) {
-        executeQuery("update groups set name = ?,  dinner_time = ? where id = ?", ps -> {
+        databaseSource.executeQuery("update groups set name = ?,  dinner_time = ? where id = ?", ps -> {
             ps.setString(1, group.getName());
             ps.setString(2, group.getDinnerTime());
             ps.setLong(3, group.getId());
@@ -83,7 +88,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     @Override
     public void delete(Long id) {
-        executeTransaction(connection -> {
+        databaseSource.executeTransaction(connection -> {
             try (PreparedStatement ps = connection.prepareStatement("update users set group_id = ? where group_id = ?")) {
                 ps.setLong(1, noneGroupId);
                 ps.setLong(2, id);
@@ -99,7 +104,7 @@ public class GroupDataMapperPgImpl extends AbstractDataMapper implements GroupDa
 
     @Override
     public List<Group> findAll() {
-        return executeQuery("select * from groups where id != ?", ps -> {
+        return databaseSource.executeQuery("select * from groups where id != ?", ps -> {
             ps.setLong(1, noneGroupId);
             ResultSet rs = ps.executeQuery();
             List<Group> groups = new ArrayList<>();

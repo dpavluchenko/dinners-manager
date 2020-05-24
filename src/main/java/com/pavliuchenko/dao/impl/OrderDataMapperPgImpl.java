@@ -1,12 +1,14 @@
 package com.pavliuchenko.dao.impl;
 
 import com.pavliuchenko.dao.client.OrderDataMapper;
+import com.pavliuchenko.dao.source.DatabaseSource;
 import com.pavliuchenko.domain.Order;
 import com.pavliuchenko.domain.Period;
 import com.pavliuchenko.domain.dto.GroupOrderDetails;
 import com.pavliuchenko.domain.dto.MenuOrder;
 import com.pavliuchenko.domain.dto.OrderDetails;
 import com.pavliuchenko.domain.dto.OrderStatistic;
+import com.pavliuchenko.infrastructure.annotation.InjectType;
 import com.pavliuchenko.infrastructure.annotation.Singleton;
 
 import java.sql.Date;
@@ -15,7 +17,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 @Singleton
-public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDataMapper {
+public class OrderDataMapperPgImpl implements OrderDataMapper {
+
+    @InjectType
+    private DatabaseSource databaseSource;
 
     private final Long notExistedOrderId = -1L;
 
@@ -28,7 +33,7 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
     public List<Order> save(List<Order> orders) {
         List<Order> newOrders = orders.stream().filter(order -> order.getId().equals(notExistedOrderId)).collect(Collectors.toList());
         List<Order> oldOrders = orders.stream().filter(order -> !order.getId().equals(notExistedOrderId)).collect(Collectors.toList());
-        return executeTransaction(connection -> {
+        return databaseSource.executeTransaction(connection -> {
            if (!oldOrders.isEmpty()) update(connection, oldOrders);
             if (!newOrders.isEmpty()) return insert(connection, newOrders);
             else return Collections.emptyList();
@@ -41,7 +46,7 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
                 "  join meals as m on menu.id = m.menu_id and date>=? and date<=?" +
                 "  left outer join orders o on m.id = o.meal_id and o.user_id=?";
 
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(period.getStartDate()));
             ps.setDate(2, Date.valueOf(period.getEndDate()));
             ps.setLong(3, userId);
@@ -81,7 +86,7 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
                 " and o.is_chosen = true and o.user_id = u.id and u.group_id = g.id" +
                 " group by g.id, m.type" +
                 " order by g.id";
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(date));
             ResultSet rs = ps.executeQuery();
             Map<Long, OrderStatistic> statisticByGroup = new HashMap<>();
@@ -114,7 +119,7 @@ public class OrderDataMapperPgImpl extends AbstractDataMapper implements OrderDa
                 "  join users u on u.group_id = ?" +
                 "  left outer join orders o on m.id = o.meal_id and u.id = o.user_id" +
                 "  order by u.id;";
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(date));
             ps.setLong(2, groupId);
             ResultSet rs = ps.executeQuery();

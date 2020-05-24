@@ -2,9 +2,11 @@ package com.pavliuchenko.dao.impl;
 
 import com.pavliuchenko.dao.client.Page;
 import com.pavliuchenko.dao.client.UserDataMapper;
+import com.pavliuchenko.dao.source.DatabaseSource;
 import com.pavliuchenko.domain.User;
 import com.pavliuchenko.domain.UserRole;
 import com.pavliuchenko.domain.dto.UserInfo;
+import com.pavliuchenko.infrastructure.annotation.InjectType;
 import com.pavliuchenko.infrastructure.annotation.Singleton;
 
 import java.sql.Connection;
@@ -14,12 +16,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 @Singleton
-public class UserDataMapperPgImpl extends AbstractDataMapper implements UserDataMapper {
+public class UserDataMapperPgImpl implements UserDataMapper {
+
+    @InjectType
+    private DatabaseSource databaseSource;
 
     @Override
     public User findByUsername(String username) {
         String sql = "select * from users where username=?";
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             User user = new User();
@@ -37,7 +42,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public void update(Long id, Long groupId) {
-        executeQuery("update users set group_id = ? where id = ?", ps -> {
+        databaseSource.executeQuery("update users set group_id = ? where id = ?", ps -> {
             ps.setLong(1, groupId);
             ps.setLong(2, id);
             return ps.execute();
@@ -46,7 +51,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public void delete(Long id) {
-        executeQuery("delete from users where id = ?", ps -> {
+        databaseSource.executeQuery("delete from users where id = ?", ps -> {
             ps.setLong(1, id);
             return ps.execute();
         });
@@ -54,7 +59,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public Page<UserInfo> searchByFullName(String fullName, int pageNumber, int size) {
-        return executeTransaction(connection -> {
+        return databaseSource.executeTransaction(connection -> {
             int offset = (pageNumber - 1) * size;
             String regex = '%' + fullName + '%';
             String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name" +
@@ -86,7 +91,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
 
     @Override
     public Page<UserInfo> findAll(int pageNumber, int size) {
-        return executeTransaction(connection -> {
+        return databaseSource.executeTransaction(connection -> {
             int offset = (pageNumber - 1) * size;
             String selectSql = "select u.id, u.full_name, g.dinner_time, g.name as group_name from users u, groups g" +
                     " where u.group_id = g.id" +
@@ -111,7 +116,7 @@ public class UserDataMapperPgImpl extends AbstractDataMapper implements UserData
     @Override
     public User create(User user) {
         String sql = "insert into users (username, password, full_name, role, group_id) values (?, ?, ?, ?, ?) returning id";
-        Long id = executeQuery(sql, ps -> {
+        Long id = databaseSource.executeQuery(sql, ps -> {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getFullName());

@@ -1,12 +1,14 @@
 package com.pavliuchenko.dao.impl;
 
 import com.pavliuchenko.dao.client.DayMenuDataMapper;
+import com.pavliuchenko.dao.source.DatabaseSource;
 import com.pavliuchenko.domain.DayMenu;
 import com.pavliuchenko.domain.Meal;
 import com.pavliuchenko.domain.MealType;
 import com.pavliuchenko.domain.Period;
 import com.pavliuchenko.domain.dto.MenuDetails;
 import com.pavliuchenko.exception.dao.NotFoundDataMapperException;
+import com.pavliuchenko.infrastructure.annotation.InjectType;
 import com.pavliuchenko.infrastructure.annotation.Singleton;
 
 import java.sql.Date;
@@ -17,11 +19,14 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Singleton
-public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMenuDataMapper {
+public class DayMenuDataMapperPgImpl implements DayMenuDataMapper {
+
+    @InjectType
+    private DatabaseSource databaseSource;
 
     @Override
     public DayMenu create(DayMenu menu) {
-        return executeTransaction(connection -> {
+        return databaseSource.executeTransaction(connection -> {
             try (PreparedStatement createMenu = connection.prepareStatement("insert into day_menu (date) values (?) returning id")) {
                 createMenu.setDate(1, Date.valueOf(menu.getDate()));
                 ResultSet result = createMenu.executeQuery();
@@ -46,7 +51,7 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
     @Override
     public void update(Long id, Map<MealType, String> meals) {
         String sql = "update meals set name=? where menu_id=? and type=?";
-        executeQuery(sql, ps -> {
+        databaseSource.executeQuery(sql, ps -> {
             for (Map.Entry<MealType, String> meal : meals.entrySet()) {
                 ps.setString(1, meal.getValue());
                 ps.setLong(2, id);
@@ -60,7 +65,7 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
     @Override
     public LocalDate delete(Long id) {
         String sql = "delete from day_menu where id=? returning date";
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setLong(1, id);
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
@@ -78,7 +83,7 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
                 " where d.date=?" +
                 " and d.id=m.menu_id ";
 
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(date));
             ResultSet rs = ps.executeQuery();
             return getMenuDetails(rs);
@@ -93,7 +98,7 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
                 " and d.date<=?" +
                 " and d.id=m.menu_id ";
 
-        return executeQuery(sql, ps -> {
+        return databaseSource.executeQuery(sql, ps -> {
             ps.setDate(1, Date.valueOf(period.getStartDate()));
             ps.setDate(2, Date.valueOf(period.getEndDate()));
             ResultSet rs = ps.executeQuery();
@@ -103,7 +108,7 @@ public class DayMenuDataMapperPgImpl extends AbstractDataMapper implements DayMe
 
     @Override
     public LocalDate findMaxMealDate() {
-        return executeQuery("select max(date) date from day_menu", ps -> {
+        return databaseSource.executeQuery("select max(date) date from day_menu", ps -> {
             ResultSet resultSet = ps.executeQuery();
             resultSet.next();
             Date date = resultSet.getDate("date");

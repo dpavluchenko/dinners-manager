@@ -4,7 +4,6 @@ import com.pavliuchenko.config.ApplicationProperties;
 import com.pavliuchenko.infrastructure.ApplicationContext;
 import com.pavliuchenko.infrastructure.annotation.Property;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -23,11 +22,16 @@ public class PropertyObjectConfigurator implements Configurator {
                 field.setAccessible(true);
                 String property = properties.getProperty(annotation.value());
                 if (Number.class.isAssignableFrom(field.getType())) {
-                    field.set(o, NumberUtils.createNumber(property));
+                    field.set(o, createNumber(field.getType(), property));
                 } else {
                     field.set(o, property);
                 }
             }
         }
+    }
+
+    private <T extends Number> T createNumber(Class<?> type, String property){
+       if (type.equals(Long.class)) return (T) Long.valueOf(property);
+       else return (T) Integer.valueOf(property);
     }
 }

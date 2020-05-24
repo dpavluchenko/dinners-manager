@@ -11,7 +11,7 @@ public class ApplicationProperties {
 
     private Properties properties;
 
-    private ApplicationProperties() {
+    public ApplicationProperties() {
         properties = new Properties();
         try (InputStream stream = ApplicationProperties.class.
                 getResourceAsStream("/application.properties")) {

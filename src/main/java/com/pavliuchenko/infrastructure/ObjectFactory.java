@@ -40,6 +40,7 @@ public class ObjectFactory {
     private void invokeInitMethod(Object o) throws InvocationTargetException, IllegalAccessException {
         for (Method method : o.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(PostConstruct.class)){
+                method.setAccessible(true);
                 method.invoke(o);
             }
         }

@@ -1,7 +1,4 @@
-package com.pavliuchenko.dao.impl;
-
-import com.pavliuchenko.exception.dao.AlreadyExistDataMapperException;
-import com.pavliuchenko.exception.dao.DataMapperException;
+package com.pavliuchenko.exception.dao;
 
 import java.sql.SQLException;
 
